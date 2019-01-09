@@ -44,8 +44,8 @@ class BasicForm extends Component {
                         onChange={this.onChange}
                         validate={[
                             required(),
-                            minLength(3),
-                            maxLength(10) ]}
+                            minLength(5),
+                            maxLength(25) ]}
                     />
 
                     <Input

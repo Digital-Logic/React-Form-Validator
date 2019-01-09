@@ -4,6 +4,8 @@ import { mount } from 'enzyme';
 
 import { withGroupValidation, withValidate, required } from '../index';
 
+jest.useFakeTimers();
+
 describe("withGroupValidation: Testing hoc group validation component", () => {
 
     var component,
@@ -12,6 +14,7 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
     beforeAll(() => {
         component = mount( <FormWrapper /> );   // the definition of <FormWrapper /> is at the end of this file
         onValidate = component.instance().onValidate;  // reference to the onValidate method
+        jest.runAllTimers();
     });
 
     afterEach(() => {
@@ -32,6 +35,7 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
         expect(onValidate.mock.calls.length).toBe(0);
         expect(component.state('isValid')).toBe(false);
         component.setState({input2: 'b'});
+        jest.runAllTimers();
         expect(onValidate.mock.calls.length).toBe(1);
         expect(component.state('isValid')).toBe(true);
     });
@@ -40,6 +44,7 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
         expect(onValidate.mock.calls.length).toBe(0);
         expect(component.state('isValid')).toBe(true);
         component.setState({input1: ''});
+        jest.runAllTimers();
         expect(onValidate.mock.calls.length).toBe(1);
         expect(component.state('isValid')).toBe(false);
     });

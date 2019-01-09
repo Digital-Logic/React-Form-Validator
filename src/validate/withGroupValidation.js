@@ -16,6 +16,8 @@ function withGroupValidation (WrappedComponent) {
                                 console.log('Error: withGroupValidation: group validation can only be preformed on elements that have a name property.');
 
                             return child.props.name
+                        } else {
+                            return child;
                         }
                     })
                     // convert array property names into and object { [name]: true }
@@ -36,7 +38,7 @@ function withGroupValidation (WrappedComponent) {
 
         calIsFormValid() {
             // has the user provided an onValidate handle?
-            if (typeof this.props.onValidate !== 'function') return;
+            if (typeof this.props.onValidate !== 'function' || this.props.isValid == undefined) return;
             // this.state is a collection of input elements that are children of this component
             // reduce (this.state) into a true value if every input element isValid,
             // reduce (this.state) into a false value if one or more input elements current state is inValid.
@@ -71,6 +73,8 @@ function withGroupValidation (WrappedComponent) {
                                 onValidate: this.onInputValidate,
                                 showErrors
                             })
+                        } else {
+                            return child;
                         }
                     })}
 
@@ -78,13 +82,24 @@ function withGroupValidation (WrappedComponent) {
                 />
             );
         }
-    }
 
-    WithGroupValidation.propTypes = {
-        onValidate: PropTypes.func, // function to execute on validation state change
-        isValid: PropTypes.bool, // is the form valid
-        showErrors: PropTypes.bool // show form errors
-    };
+        static get propTypes () {
+            return {
+                onValidate: function(props, propName, componentName) {
+                    if(props[propName]) {
+                        if (typeof props[propName] !== 'function')
+                        {
+                            return new Error(`${propName} can only be a function.`)
+                        }
+                        if (typeof props.isValid !== 'boolean')
+                            return new Error('onValidate requires prop isValid to function correctly.');
+                    }
+                },
+                isValid: PropTypes.bool, // is the form valid
+                showErrors: PropTypes.bool // show form errors
+            }
+        }
+    }
 
     return WithGroupValidation;
 }

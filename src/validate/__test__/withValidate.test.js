@@ -4,6 +4,8 @@ import { mount } from 'enzyme';
 
 import { withValidate } from '../index';
 
+jest.useFakeTimers();
+
 describe("withValidation Test", () => {
     const Input = ({ errorMessage, ...props }) => (
         <div>
@@ -24,6 +26,7 @@ describe("withValidation Test", () => {
         };
 
         wrapper = mount(<WrappedInput { ...props } />);
+        jest.runAllTimers();
     });
 
     it('Should mount', () => {
@@ -37,6 +40,7 @@ describe("withValidation Test", () => {
     it('Should show error message when input has been touched', () => {
         expect(props.validate.mock.calls.length).toBe(2);
         wrapper.setState({ touched: true });
+        jest.runAllTimers();
         expect(props.validate.mock.calls.length).toBe(3);
         expect(wrapper.find(Input).prop('errorMessage')).toBe('ERROR');
         expect(wrapper.find('span').html()).toBe('<span>ERROR</span>');

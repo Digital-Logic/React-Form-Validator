@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { debounce } from './util';
 import PropTypes from 'prop-types';
 
 function withValidate(WrappedComponent) {
@@ -17,7 +18,11 @@ function withValidate(WrappedComponent) {
             this.checkValidation();
         }
 
-        checkValidation() {
+        componentWillUnmount() {
+            this.checkValidation.cancel();
+        }
+
+        checkValidation = debounce( () => {
             // no validators exist, exit
             if (this.props.validate == null) return;
 
@@ -48,7 +53,7 @@ function withValidate(WrappedComponent) {
                     });
                 }
             }
-        }
+        }, 400);
 
         onBlur = this.onBlur.bind(this);
         onBlur(event) {
@@ -70,15 +75,17 @@ function withValidate(WrappedComponent) {
                     errorMessage={ touched || showErrors ?  errorMessage : '' }/>
             );
         }
-    }
 
-    WithValidate.propTypes = {
-        validate: PropTypes.oneOfType([
-            PropTypes.func,
-            PropTypes.arrayOf(PropTypes.func)
-        ]),
-        showErrors: PropTypes.bool
-    };
+        static get propTypes() {
+            return {
+                validate: PropTypes.oneOfType([
+                    PropTypes.func,
+                    PropTypes.arrayOf(PropTypes.func)
+                ]),
+                showErrors: PropTypes.bool
+            }
+        }
+    }
 
     return WithValidate;
 }
