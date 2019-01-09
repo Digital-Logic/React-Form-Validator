@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Input, Form } from '../UI/form';
 import { required, isEqualTo, isNumber, minLength, maxLength } from '../validate';
 
-class BasicForm extends Component {
+class BasicForm extends PureComponent {
     state = {
         name: '',
         age: '',
@@ -71,7 +71,7 @@ class BasicForm extends Component {
                         validate={ [required('Please conform your password'), isEqualTo(password)] }
                     />
 
-                    <button type="submit">Submit</button>
+                    <button disabled={!isValid} type="submit">Submit</button>
                 </Form>
 
                 <Form>

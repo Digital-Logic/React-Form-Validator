@@ -21,12 +21,11 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
         onValidate.mockClear(); // clear stored data within function mock
     });
 
-    it('Should mount, onValidate should be called on mount, isValid should be false', () => {
+    it('Should mount, isValid should be false', () => {
         expect(component.find('form').length).toBe(1);
         expect(component.find('input').length).toBe(2);
         // onValidate gets call when the component is mounted to find out each elements validation state
         // and share that info the the parent component.
-        expect(onValidate.mock.calls.length).toBeGreaterThan(0);
         expect(component.state('isValid')).toBe(false);
     });
 

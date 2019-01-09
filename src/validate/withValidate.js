@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { debounce } from './util';
 import PropTypes from 'prop-types';
 
 function withValidate(WrappedComponent, validationDelay = 200) {
 
-    class WithValidate extends Component {
+    class WithValidate extends PureComponent {
         state = {
             touched: false,
             errorMessage: ''

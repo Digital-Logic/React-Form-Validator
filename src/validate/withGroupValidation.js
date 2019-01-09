@@ -1,8 +1,9 @@
-import React, { Component, Children, cloneElement } from 'react';
+import React, { PureComponent, Children, cloneElement } from 'react';
+import { debounce } from './util';
 import PropTypes from 'prop-types';
 
-function withGroupValidation (WrappedComponent) {
-    class WithGroupValidation extends Component {
+function withGroupValidation (WrappedComponent, validateDelay = 200) {
+    class WithGroupValidation extends PureComponent {
 
         constructor(props) {
             super(props);
@@ -12,7 +13,7 @@ function withGroupValidation (WrappedComponent) {
                 Children.map( this.props.children || [] /* removes the need for a null check */,
                     child => {
                         if ('validate' in child.props) {
-                            if (child.props.name == undefined)
+                            if (child.props.name === undefined)
                                 console.log('Error: withGroupValidation: group validation can only be preformed on elements that have a name property.');
 
                             return child.props.name
@@ -36,9 +37,9 @@ function withGroupValidation (WrappedComponent) {
             this.calIsFormValid();
         }
 
-        calIsFormValid() {
+        calIsFormValid = debounce(() => {
             // has the user provided an onValidate handle?
-            if (typeof this.props.onValidate !== 'function' || this.props.isValid == undefined) return;
+            if (typeof this.props.onValidate !== 'function' || this.props.isValid === undefined) return;
             // this.state is a collection of input elements that are children of this component
             // reduce (this.state) into a true value if every input element isValid,
             // reduce (this.state) into a false value if one or more input elements current state is inValid.
@@ -53,7 +54,7 @@ function withGroupValidation (WrappedComponent) {
             // update parent elements state, if necessary
             if (isValid !== this.props.isValid)
                 this.props.onValidate(isValid);
-        }
+        }, validateDelay);
 
         onInputValidate = this.onInputValidate.bind(this);
         onInputValidate({name, isValid}) {
