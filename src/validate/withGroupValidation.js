@@ -20,7 +20,7 @@ function withGroupValidation (WrappedComponent) {
                             return child;
                         }
                     })
-                    // convert array property names into and object { [name]: true }
+                    // convert array property names into object key,value pair { [name]: true }
                     .reduce( (_state, cur) => {
                         // input element validation state, initially set to true
                         _state[cur] = true;

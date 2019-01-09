@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { debounce } from './util';
 import PropTypes from 'prop-types';
 
-function withValidate(WrappedComponent) {
+function withValidate(WrappedComponent, validationDelay = 200) {
 
     class WithValidate extends Component {
         state = {
@@ -22,7 +22,7 @@ function withValidate(WrappedComponent) {
             this.checkValidation.cancel();
         }
 
-        checkValidation = debounce( () => {
+        checkValidation = debounce(() => {
             // no validators exist, exit
             if (this.props.validate == null) return;
 
@@ -53,7 +53,7 @@ function withValidate(WrappedComponent) {
                     });
                 }
             }
-        }, 400);
+        }, validationDelay);
 
         onBlur = this.onBlur.bind(this);
         onBlur(event) {
