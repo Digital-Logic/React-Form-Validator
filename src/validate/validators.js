@@ -1,3 +1,4 @@
+import isEmailValidator from 'validator/lib/isEmail';
 
 function required(message = 'This field is required') {
     return function _required(curValue) {
@@ -41,6 +42,14 @@ function maxLength (maxValue, message = `${maxValue} characters max`) {
     };
 }
 
+function isEmail(message = `Please enter a valid eMail address.`) {
+    return function _isEmail(email) {
+        if (isEmailValidator(email))
+            return '';
+        else return message;
+    }
+}
+
 // todo - isInteger, lessThan, greaterThan
 
 export {
@@ -48,5 +57,6 @@ export {
     isEqualTo,
     isNumber,
     minLength,
-    maxLength
+    maxLength,
+    isEmail
 };
