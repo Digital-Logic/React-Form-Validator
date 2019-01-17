@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Input, Form} from '../UI/form';
 import { required, minLength, maxLength, isEmail, isEqualTo } from '../validate/validators';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
 class BasicForm extends PureComponent {
     state = {
@@ -9,7 +10,8 @@ class BasicForm extends PureComponent {
         email: '',
         password: '',
         conformPassword: '',
-        isValid: false
+        isValid: false,
+        formKey: 0 // Used to reset the form
     };
 
     onInputUpdate = this.onInputUpdate.bind(this);
@@ -44,14 +46,28 @@ class BasicForm extends PureComponent {
         }
     }
 
+    onReset = this.onReset.bind(this);
+    onReset() {
+        this.setState(state => ({
+            name: '',
+            email: '',
+            password: '',
+            conformPassword: '',
+            isValid: false,
+            formKey: state.formKey + 1
+        }));
+    }
+
     render() {
-        const { name, email, password, conformPassword, isValid } = this.state;
+        const { name, email, password, conformPassword, isValid, formKey } = this.state;
 
         return (
             <Form
                 onSubmit={this.onSubmit}
                 onValidate={this.onValidate}
-                isValid={isValid}>
+                isValid={isValid}
+                key={formKey}>
+
                 <Input
                     label="Name"
                     name="name"
@@ -81,11 +97,19 @@ class BasicForm extends PureComponent {
                     validate={[required(), isEqualTo(password)]}
                     onChange={this.onInputUpdate} />
 
-                <Button
-                    style={{ marginTop: '0.5em'}}
-                    disabled={!isValid}
-                    type="submit"
-                    variant="outlined">Submit</Button>
+                <Grid container justify="space-between">
+                    <Button
+                        style={{ marginTop: '0.5em'}}
+                        disabled={!isValid}
+                        type="submit"
+                        variant="outlined">Submit</Button>
+
+                    <Button
+                        style={{ marginTop: '0.5em'}}
+                        onClick={this.onReset}
+                        variant="outlined">Reset Form</Button>
+                </Grid>
+
             </Form>
         );
     }
