@@ -1,6 +1,6 @@
 # Simple React Form Validation
 
-## [Demo] coming soon
+## [Demo](http://form-validator.digital-logic.net/)
 
 ## How does it work?
 
