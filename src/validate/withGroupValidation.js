@@ -1,8 +1,8 @@
 import React, { PureComponent, Children, cloneElement } from 'react';
-import { debounce } from './util';
+import { throttle } from './util';
 import PropTypes from 'prop-types';
 
-function withGroupValidation (WrappedComponent, validateDelay = 200) {
+function withGroupValidation (WrappedComponent) {
     class WithGroupValidation extends PureComponent {
 
         constructor(props) {
@@ -37,7 +37,7 @@ function withGroupValidation (WrappedComponent, validateDelay = 200) {
             this.calIsFormValid();
         }
 
-        calIsFormValid = debounce(() => {
+        calIsFormValid = throttle(() => {
             // has the user provided an onValidate handle?
             if (typeof this.props.onValidate !== 'function' || this.props.isValid === undefined) return;
             // this.state is a collection of input elements that are children of this component
@@ -54,7 +54,7 @@ function withGroupValidation (WrappedComponent, validateDelay = 200) {
             // update parent elements state, if necessary
             if (isValid !== this.props.isValid)
                 this.props.onValidate(isValid);
-        }, validateDelay);
+        }, this.props.validateDelay);
 
         onInputValidate = this.onInputValidate.bind(this);
         onInputValidate({name, isValid}) {
@@ -64,7 +64,7 @@ function withGroupValidation (WrappedComponent, validateDelay = 200) {
         }
 
         render() {
-            const { isValid, children, onValidate, showErrors, ...props } = this.props;
+            const { isValid, children, onValidate, showErrors, validationDelay, ...props } = this.props;
 
             return (
                 <WrappedComponent
@@ -97,8 +97,14 @@ function withGroupValidation (WrappedComponent, validateDelay = 200) {
                     }
                 },
                 isValid: PropTypes.bool, // is the form valid
-                showErrors: PropTypes.bool // show form errors
+                showErrors: PropTypes.bool, // show form errors
+                validationDelay: PropTypes.number.isRequired
             }
+        }
+        static get defaultProps() {
+            return {
+                validationDelay: 250
+            };
         }
     }
 
