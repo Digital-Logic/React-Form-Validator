@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
-import { debounce } from './util';
+import { throttle } from './util';
 import PropTypes from 'prop-types';
 
-function withValidate(WrappedComponent, validationDelay = 200) {
+function withValidate(WrappedComponent) {
 
     class WithValidate extends PureComponent {
         state = {
@@ -22,7 +22,7 @@ function withValidate(WrappedComponent, validationDelay = 200) {
             this.checkValidation.cancel();
         }
 
-        checkValidation = debounce(() => {
+        checkValidation = throttle(() => {
             // no validators exist, exit
             if (this.props.validate == null) return;
 
@@ -53,7 +53,7 @@ function withValidate(WrappedComponent, validationDelay = 200) {
                     });
                 }
             }
-        }, validationDelay);
+        }, this.props.validationDelay);
 
         onBlur = this.onBlur.bind(this);
         onBlur(event) {
@@ -66,7 +66,7 @@ function withValidate(WrappedComponent, validationDelay = 200) {
         }
 
         render() {
-            const { validate, onBlur, onValidate, showErrors, ...props } = this.props;
+            const { validate, onBlur, onValidate, showErrors, validationDelay, ...props } = this.props;
             const { touched, errorMessage } = this.state;
 
             return (
@@ -82,8 +82,15 @@ function withValidate(WrappedComponent, validationDelay = 200) {
                     PropTypes.func,
                     PropTypes.arrayOf(PropTypes.func)
                 ]),
-                showErrors: PropTypes.bool
-            }
+                showErrors: PropTypes.bool,
+                validationDelay: PropTypes.number.isRequired
+            };
+        }
+
+        static get defaultProps() {
+            return {
+                validationDelay: 400
+            };
         }
     }
 

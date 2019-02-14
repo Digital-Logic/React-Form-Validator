@@ -37,7 +37,7 @@ class BasicForm extends PureComponent {
         if(this.state.isValid) {
             this.props.onSubmit(
                 Object.entries(this.state)
-                    .filter( ([key, value]) => key !== 'isValid' && key !== 'conformPassword')
+                    .filter( ([key, value]) => key !== 'isValid' && key !== 'conformPassword' && key !== 'formKey')
                     .reduce((acc, [key, value]) => {
                         acc[key] = value;
                         return acc;
