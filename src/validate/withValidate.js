@@ -1,10 +1,10 @@
-import React, { PureComponent } from 'react';
-import { throttle } from './util';
+import React, { Component } from 'react';
+import { debounce } from './util';
 import PropTypes from 'prop-types';
 
 function withValidate(WrappedComponent) {
 
-    class WithValidate extends PureComponent {
+    class WithValidate extends Component {
         state = {
             touched: false,
             errorMessage: ''
@@ -22,7 +22,36 @@ function withValidate(WrappedComponent) {
             this.checkValidation.cancel();
         }
 
-        checkValidation = throttle(() => {
+        shouldComponentUpdate(nextProps, nextState) {
+            // Has internal state changed
+            for (let [key, value] of Object.entries(nextState)) {
+                if (this.state[key] !== value)
+                    return true;
+            }
+
+            // has props changed, excluding validate methods
+            for (let [key, value] of Object.entries(nextProps).filter( ([key, value]) => key !== 'validate')) {
+                if (this.props[key] !== value)
+                    return true;
+            }
+
+            // Props and state have not changed, are the validation methods pure functions, or do they
+            // depend on external state.
+
+            if (Array.isArray(nextProps.validate)) {
+                return nextProps.validate.reduce( (notPure, v) => {
+                    if (!v.pure)
+                        return true;
+                    return notPure;
+                }, false);
+            } else if (nextProps.validate) {
+                return !nextProps.validate.pure;
+            }
+
+            return false;
+        }
+
+        checkValidation = debounce(() => {
             // no validators exist, exit
             if (this.props.validate == null) return;
 
@@ -89,7 +118,7 @@ function withValidate(WrappedComponent) {
 
         static get defaultProps() {
             return {
-                validationDelay: 400
+                validationDelay: 500
             };
         }
     }

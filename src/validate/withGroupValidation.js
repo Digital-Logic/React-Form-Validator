@@ -5,29 +5,7 @@ import PropTypes from 'prop-types';
 function withGroupValidation (WrappedComponent) {
     class WithGroupValidation extends PureComponent {
 
-        constructor(props) {
-            super(props);
-
-            // dynamically create state that matches children components
-            this.state =
-                Children.map( this.props.children || [] /* removes the need for a null check */,
-                    child => {
-                        if ('validate' in child.props) {
-                            if (child.props.name === undefined)
-                                console.log('Error: withGroupValidation: group validation can only be preformed on elements that have a name property.');
-
-                            return child.props.name
-                        } else {
-                            return child;
-                        }
-                    })
-                    // convert array property names into object key,value pair { [name]: true }
-                    .reduce( (_state, cur) => {
-                        // input element validation state, initially set to true
-                        _state[cur] = true;
-                        return _state;
-                    }, {});
-        }
+        state = {};
 
         componentDidMount() {
             this.calIsFormValid();
@@ -54,6 +32,7 @@ function withGroupValidation (WrappedComponent) {
             // update parent elements state, if necessary
             if (isValid !== this.props.isValid)
                 this.props.onValidate(isValid);
+
         }, this.props.validateDelay);
 
         onInputValidate = this.onInputValidate.bind(this);
@@ -63,22 +42,39 @@ function withGroupValidation (WrappedComponent) {
             });
         }
 
+
+        // Recursively map children
+        mapChildren = this.mapChildren.bind(this);
+        mapChildren(children, depth = 0) {
+
+            if (depth < this.props.searchDepth) { // limit search depth
+
+                return Children.map(children, child => {
+
+                    if (React.isValidElement(child)) {
+                        if ('validate' in child.props) {
+                            return cloneElement(child, {
+                                onValidate: this.onInputValidate,
+                                showErrors: this.props.showErrors
+                            });
+                        } else if (child.props.children) {
+                            return cloneElement(child, {
+                                children: this.mapChildren(child.props.children, depth + 1)
+                            });
+                        }
+                    }
+                    return child;
+                });
+            }
+            return children;
+        }
+
         render() {
-            const { isValid, children, onValidate, showErrors, validationDelay, ...props } = this.props;
+            const { isValid, children, onValidate, showErrors, validationDelay, searchDepth, ...props } = this.props;
 
             return (
                 <WrappedComponent
-                    children={ Children.map(children, child => {
-                        if ('validate' in child.props) {
-                            return cloneElement( child, {
-                                onValidate: this.onInputValidate,
-                                showErrors
-                            })
-                        } else {
-                            return child;
-                        }
-                    })}
-
+                    children={ this.mapChildren(children) }
                     {...props }
                 />
             );
@@ -98,12 +94,14 @@ function withGroupValidation (WrappedComponent) {
                 },
                 isValid: PropTypes.bool, // is the form valid
                 showErrors: PropTypes.bool, // show form errors
-                validationDelay: PropTypes.number.isRequired
+                validationDelay: PropTypes.number.isRequired,
+                searchDepth: PropTypes.number.isRequired
             }
         }
         static get defaultProps() {
             return {
-                validationDelay: 250
+                validationDelay: 250,
+                searchDepth: 2
             };
         }
     }

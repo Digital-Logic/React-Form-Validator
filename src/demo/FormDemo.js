@@ -2,7 +2,17 @@ import React, { PureComponent } from 'react';
 import { Input, Form} from '../UI/form';
 import { required, minLength, maxLength, isEmail, isEqualTo } from '../validate/validators';
 import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+
+const styles = theme => ({
+    wrappedComponent: {
+        border: "1px solid rgba(255,255,255,0.87)",
+        padding: '5px 10px',
+        borderRadius: '5px',
+        margin: '10px 5px'
+    }
+});
 
 class BasicForm extends PureComponent {
     state = {
@@ -10,6 +20,8 @@ class BasicForm extends PureComponent {
         email: '',
         password: '',
         conformPassword: '',
+        wrappedComponent: '',
+        optional: '',
         isValid: false,
         formKey: 0 // Used to reset the form
     };
@@ -53,13 +65,15 @@ class BasicForm extends PureComponent {
             email: '',
             password: '',
             conformPassword: '',
+            wrappedComponent: '',
             isValid: false,
             formKey: state.formKey + 1
         }));
     }
 
     render() {
-        const { name, email, password, conformPassword, isValid, formKey } = this.state;
+        const { name, email, password, conformPassword, wrappedComponent, optional, isValid, formKey } = this.state;
+        const { classes } = this.props;
 
         return (
             <Form
@@ -97,6 +111,22 @@ class BasicForm extends PureComponent {
                     validate={[required(), isEqualTo(password)]}
                     onChange={this.onInputUpdate} />
 
+                <div className={classes.wrappedComponent}>
+                    <Input
+                        label="Wrapped Component"
+                        name="wrappedComponent"
+                        value={ wrappedComponent }
+                        validate={[required()]}
+                        onChange={this.onInputUpdate} />
+
+                    <Input
+                        label="Optional Input"
+                        name="optional"
+                        value={optional}
+                        validate={[maxLength(15)]}
+                        onChange={this.onInputUpdate} />
+                </div>
+
                 <Grid container justify="space-between">
                     <Button
                         style={{ marginTop: '0.5em'}}
@@ -113,9 +143,7 @@ class BasicForm extends PureComponent {
             </Form>
         );
     }
-
-
 }
 
 
-export default BasicForm;
+export default withStyles(styles)(BasicForm);

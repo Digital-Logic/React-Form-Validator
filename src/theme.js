@@ -8,7 +8,10 @@ const darkTheme = {
         useNextVariants: true,
     },
     palette: {
-        type: 'dark'
+        type: 'dark',
+        primary: {
+            main: "rgba(55,229,255, 0.87)"
+        }
     }
 };
 

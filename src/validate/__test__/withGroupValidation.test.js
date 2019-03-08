@@ -23,7 +23,7 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
 
     it('Should mount, isValid should be false', () => {
         expect(component.find('form').length).toBe(1);
-        expect(component.find('input').length).toBe(2);
+        expect(component.find(InputComponent).length).toBe(3);
         // onValidate gets call when the component is mounted to find out each elements validation state
         // and share that info the the parent component.
         expect(component.state('isValid')).toBe(false);
@@ -34,6 +34,7 @@ describe("withGroupValidation: Testing hoc group validation component", () => {
         expect(onValidate.mock.calls.length).toBe(0);
         expect(component.state('isValid')).toBe(false);
         component.setState({input2: 'b'});
+        component.setState({input3: 'c'})
         jest.runAllTimers();
         expect(onValidate.mock.calls.length).toBe(1);
         expect(component.state('isValid')).toBe(true);
@@ -72,7 +73,6 @@ const Input = ({errorMessage}) => (
 
 const InputComponent = withValidate(Input);
 
-
 const Form = withGroupValidation( (props) => (
     <form {...props} />
 ));
@@ -81,6 +81,7 @@ class FormWrapper extends Component {
     state = {
         input1: '',
         input2: '',
+        input3: '',
         isValid: false,
         showErrors: false
     };
@@ -103,6 +104,16 @@ class FormWrapper extends Component {
                     value={this.state.input2}
                     onChange={ event => this.setState({ input2: event.target.value }) }
                 />
+
+                <div>
+                    <InputComponent
+                        validate={[ required('ERROR') ]}
+                        name="input3"
+                        value={this.state.input3}
+                        onChange={ event => this.setState({ input2: event.target.value }) }
+                    />
+                </div>
+
             </Form>
         );
     }
