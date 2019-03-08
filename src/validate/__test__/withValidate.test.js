@@ -34,11 +34,11 @@ describe("withValidation Test", () => {
     });
 
     it('Should run validate methods on mount', () => {
-        expect(props.validate.mock.calls.length).toBe(1);
+        expect(props.validate.mock.calls.length).toBeGreaterThan(1);
     });
 
     it('Should show error message when input has been touched', () => {
-        expect(props.validate.mock.calls.length).toBe(1);
+        expect(props.validate.mock.calls.length).toBeGreaterThan(1);
         wrapper.setState({ touched: true });
         jest.runAllTimers();
         expect(props.validate.mock.calls.length).toBeGreaterThan(1);
