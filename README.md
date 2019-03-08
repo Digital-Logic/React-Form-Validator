@@ -18,7 +18,7 @@ function Input({label, onChange, value, errorMessage, ...props}) {
 export default withValidate(Input);
 ```
 Design your form component and wrap it with the withGroupValidation hoc.
-withGroupValidation will search direct children (it will not search recursively) for any components that are wrapped with the withValidation hoc, and manage there state and share that state with you.
+withGroupValidation will recursively search all children within your form component up to a specified search depth (default: 2) - for any components that are wrapped with the withValidation hoc, and manage there state and share that state with you.
 ```
 function Form(props) {
     return (
@@ -74,15 +74,3 @@ class BasicForm extends Component {
     }
 }
 ```
-
-
-### ToDo
-The withGroupValidation does not recursively search children components as of right now. So you cannot do something like...
-```
-<Form>
-    <div>
-        <Input />
-    </div>
-</Form>
-```
-withGroupValidation will not find the Input component. To be fixed in the future.
