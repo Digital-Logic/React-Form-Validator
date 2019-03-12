@@ -30,8 +30,8 @@ function withValidate(WrappedComponent) {
             }
 
             // has props changed, excluding validate methods
-            for (let [key, value] of Object.entries(nextProps).filter( ([key, value]) => key !== 'validate')) {
-                if (this.props[key] !== value)
+            for (let [key, value] of Object.entries(nextProps)) {
+                if (key !== 'validate' && this.props[key] !== value)
                     return true;
             }
 

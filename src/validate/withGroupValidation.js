@@ -42,8 +42,7 @@ function withGroupValidation (WrappedComponent) {
             });
         }
 
-
-        // Recursively map children
+        // remap children
         mapChildren = this.mapChildren.bind(this);
         mapChildren(children, depth = 0) {
 
