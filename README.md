@@ -31,46 +31,20 @@ export default withGroupValidation(Form);
 
 Build your form
 ```
-class BasicForm extends Component {
-    state = {
-        input1: '',
-        input2: '',
-        isValid: false, // is the form valid?
-        showErrors: false // show all errors on the form
-    }
-    // add normal event handlers
-    onChange = ...
-    onSubmit = ...
+function BasicForm () {
+    const [email, setEmail ] = useState('');
 
-    // update isValid when the forms validation changes
-    onValidate = (isValid) => this.setState({isValid})
-
-    render() {
-        const { input1, input2, isValid, showErrors } = this.state;
-        return (
-            <Form
-                isValid={isValid}
-                onValidate={this.onValidate}
-                showErrors={showErrors}
-            >
-                <Input
-                    label="Input1"
-                    name="input1"
-                    value={input1}
-                    onChange={this.onChange}
-                    validate={ required() } />
-
-                <Input
-                    label="Input2"
-                    name="input2"
-                    value={input2}
-                    onChange={this.onChange}
-                    validate={[required(), minLength(5)]}
-                />
-
-                <button type="submit">Submit</button>
-            </Form>
-        );
-    }
+    <Form // Provide an onSubmit function
+        // withGroupValidation will execute this function when
+        // the form passes validation, or display errors.
+        onSubmit={() => console.log('Data Submitted')}>
+        <Input
+            label="eMail Address"
+            name="email"
+            value={email}
+            onChange={event => setEmail(event.target.value)}
+            validate={[required()]}/>
+        <Button type="submit">Submit</Button>
+    </Form>
 }
 ```
