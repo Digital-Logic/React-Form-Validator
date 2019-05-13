@@ -118,7 +118,7 @@ function withValidate(WrappedComponent) {
 
         static get defaultProps() {
             return {
-                validationDelay: 500
+                validationDelay: 200
             };
         }
     }

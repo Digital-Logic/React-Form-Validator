@@ -30,14 +30,19 @@ const styles = theme => ({
 class App extends Component {
     state = {
         openDialog: false,
+        formKey: 0,
         formData: {}
     };
 
     onDialogClose = this.onDialogClose.bind(this);
     onDialogClose() {
-        this.setState({
+        this.setState(state => ({
             openDialog: false,
-            formData: {}
+            formKey: state.formKey + 1
+        }), () => { // clear local form data
+            this.setState({
+                formData:{}
+            });
         });
     }
 
@@ -60,7 +65,7 @@ class App extends Component {
                     <Card raised className={classes.card}>
                         <CardContent>
                             <Typography gutterBottom variant="h5">React Form Validation Demo</Typography>
-                            <FormDemo onSubmit={this.openDialog} />
+                            <FormDemo key={this.state.formKey} onSubmit={this.openDialog} />
                         </CardContent>
                     </Card>
 

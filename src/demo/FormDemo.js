@@ -1,9 +1,20 @@
-import React, { PureComponent } from 'react';
+import React, { useReducer } from 'react';
 import { Input, Form} from '../UI/form';
 import { required, minLength, maxLength, isEmail, isEqualTo } from '../validate/validators';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+
+
+const ACTIONS = Object.freeze({
+    NAME: 'NAME',
+    EMAIL: 'EMAIL',
+    PASSWORD: 'PASSWORD',
+    CONFIRM_PASSWORD: 'CONFIRM_PASSWORD',
+    WRAPPED_COMPONENT: 'WRAPPED_COMPONENT',
+    OPTIONAL: 'OPTIONAL',
+    INCREMENT_KEY: 'INCREMENT_KEY'
+});
 
 const styles = theme => ({
     wrappedComponent: {
@@ -14,134 +25,141 @@ const styles = theme => ({
     }
 });
 
-class BasicForm extends PureComponent {
-    state = {
-        name: '',
-        email: '',
-        password: '',
-        conformPassword: '',
-        wrappedComponent: '',
-        optional: '',
-        isValid: false,
-        formKey: 0 // Used to reset the form
-    };
+const initialState = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    wrappedComponent: '',
+    optional: '',
+    formKey: 0
+};
 
-    onInputUpdate = this.onInputUpdate.bind(this);
-    onInputUpdate({ target: { name, value } }) {
-        this.setState({
-            [name]: value
+function BasicForm ({ classes, onSubmit }) {
+    const [{ name, email, password, confirmPassword, wrappedComponent, optional, formKey }, dispatch ] =
+        useReducer( reducer, initialState);
+
+    function onChange(event) {
+        const { name, value } = event.target;
+        dispatch({ type: name, value });
+    }
+
+    function _onSubmit() {
+        onSubmit({
+            name,
+            email,
+            password,
+            confirmPassword,
+            wrappedComponent,
+            optional
         });
     }
 
-    onValidate = this.onValidate.bind(this);
-    onValidate(isValid) {
-        if (this.state.isValid !== isValid) {
-            this.setState({
-                isValid
-            });
-        }
-    }
+    return (
+        <Form
+            onSubmit={_onSubmit}
+            key={formKey}>
 
-    onSubmit = this.onSubmit.bind(this);
-    onSubmit(event) {
-        event.preventDefault();
+            <Input
+                label="Name"
+                name={ACTIONS.NAME}
+                value={name}
+                validate={[required(), minLength(5), maxLength(20)]}
+                onChange={onChange} />
+            <Input
+                label="eMail Address"
+                name={ACTIONS.EMAIL}
+                value={email}
+                validate={[required(), isEmail()]}
+                onChange={onChange} />
 
-        if(this.state.isValid) {
-            this.props.onSubmit(
-                Object.entries(this.state)
-                    .filter( ([key, value]) => key !== 'isValid' && key !== 'conformPassword' && key !== 'formKey')
-                    .reduce((acc, [key, value]) => {
-                        acc[key] = value;
-                        return acc;
-                    }, {})
-            );
-        }
-    }
+            <Input
+                label="Password"
+                name={ACTIONS.PASSWORD}
+                value={password}
+                type="password"
+                validate={[required(), minLength(8), maxLength(20)]}
+                onChange={onChange} />
 
-    onReset = this.onReset.bind(this);
-    onReset() {
-        this.setState(state => ({
-            name: '',
-            email: '',
-            password: '',
-            conformPassword: '',
-            wrappedComponent: '',
-            isValid: false,
-            formKey: state.formKey + 1
-        }));
-    }
+            <Input
+                label="Conform Password"
+                name={ACTIONS.CONFIRM_PASSWORD}
+                type="password"
+                value={confirmPassword}
+                validate={[required(), isEqualTo(password)]}
+                onChange={onChange} />
 
-    render() {
-        const { name, email, password, conformPassword, wrappedComponent, optional, isValid, formKey } = this.state;
-        const { classes } = this.props;
-
-        return (
-            <Form
-                onSubmit={this.onSubmit}
-                onValidate={this.onValidate}
-                isValid={isValid}
-                key={formKey}>
+            <div className={classes.wrappedComponent}>
+                <Input
+                    label="Wrapped Component"
+                    name={ACTIONS.WRAPPED_COMPONENT}
+                    value={ wrappedComponent }
+                    validate={[required()]}
+                    onChange={onChange} />
 
                 <Input
-                    label="Name"
-                    name="name"
-                    value={name}
-                    validate={[required(), minLength(5), maxLength(20)]}
-                    onChange={this.onInputUpdate} />
-                <Input
-                    label="eMail Address"
-                    name="email"
-                    value={email}
-                    validate={[required(), isEmail()]}
-                    onChange={this.onInputUpdate} />
+                    label="Optional Input"
+                    name={ACTIONS.OPTIONAL}
+                    value={optional}
+                    validate={[maxLength(15)]}
+                    onChange={onChange} />
+            </div>
 
-                <Input
-                    label="Password"
-                    name="password"
-                    value={password}
-                    type="password"
-                    validate={[required(), minLength(8), maxLength(20)]}
-                    onChange={this.onInputUpdate} />
+            <Grid container justify="space-between">
+                <Button
+                    style={{ marginTop: '0.5em'}}
+                    onClick={() => dispatch({ type: ACTIONS.INCREMENT_KEY })}
+                    variant="outlined">Reset Form</Button>
 
-                <Input
-                    label="Conform Password"
-                    name="conformPassword"
-                    type="password"
-                    value={conformPassword}
-                    validate={[required(), isEqualTo(password)]}
-                    onChange={this.onInputUpdate} />
+                <Button
+                    style={{ marginTop: '0.5em'}}
+                    type="submit"
+                    variant="outlined">Submit</Button>
+            </Grid>
 
-                <div className={classes.wrappedComponent}>
-                    <Input
-                        label="Wrapped Component"
-                        name="wrappedComponent"
-                        value={ wrappedComponent }
-                        validate={[required()]}
-                        onChange={this.onInputUpdate} />
+        </Form>
+    );
+}
 
-                    <Input
-                        label="Optional Input"
-                        name="optional"
-                        value={optional}
-                        validate={[maxLength(15)]}
-                        onChange={this.onInputUpdate} />
-                </div>
-
-                <Grid container justify="space-between">
-                    <Button
-                        style={{ marginTop: '0.5em'}}
-                        disabled={!isValid}
-                        type="submit"
-                        variant="outlined">Submit</Button>
-
-                    <Button
-                        style={{ marginTop: '0.5em'}}
-                        onClick={this.onReset}
-                        variant="outlined">Reset Form</Button>
-                </Grid>
-
-            </Form>
-        );
+function reducer(state, { type, value }) {
+    switch(type) {
+        case ACTIONS.NAME:
+            return {
+                ...state,
+                name: value
+            };
+        case ACTIONS.EMAIL:
+            return {
+                ...state,
+                email: value
+            };
+        case ACTIONS.PASSWORD:
+            return {
+                ...state,
+                password: value
+            };
+        case ACTIONS.CONFIRM_PASSWORD:
+            return {
+                ...state,
+                confirmPassword: value
+            };
+        case ACTIONS.WRAPPED_COMPONENT:
+            return {
+                ...state,
+                wrappedComponent: value
+            };
+        case ACTIONS.OPTIONAL:
+            return {
+                ...state,
+                optional: value
+            };
+        case ACTIONS.INCREMENT_KEY:
+            return {
+                ...initialState,
+                formKey: state.formKey + 1
+            };
+        default:
+            return state;
     }
 }
 

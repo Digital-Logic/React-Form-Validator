@@ -2,7 +2,7 @@ import isEmailValidator from 'validator/lib/isEmail';
 
 function required(message = 'This field is required') {
     return buildValidator( function _required(curValue) {
-        if (curValue == null || curValue.trim() === '')
+        if (curValue == null || (typeof curValue === 'string' && curValue.trim() === ''))
             return message;
         else return '';
     }, true);
