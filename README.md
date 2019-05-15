@@ -2,15 +2,15 @@
 
 ## [Demo](http://form-validator.digital-logic.net/)
 
-Easy to use.
-It provides two higher order components which you wrap your input elements and form components around. Validation is automatic, form submission will only be allowed after the form has passed validation.
+Form validation in react is hard, this library makes it simple.
 
 Optimized for performance:
-Component rendering only occurs when necessary, when the validation functions input changes, or a prop on the input element changes, and validation actions do not execute on each keystroke, but wait for a timeout to pass before evaluating the input.
+Component rendering only occurs when necessary, when the validation functions input changes, or a prop on the input element changes. Validation actions do not execute on each keystroke, but wait for a timeout to pass before evaluating the input.
 
-Easily integrates with any UI component library.
+Easy to use.
+Form validator provides two higher order components which wrap around your input elements and form component. Validation is automatic, form submission will only be allowed after the form has passed validation.
 
-Includes a variety of prebuilt validation functions, and a helper function to create your own validators.
+Easily integrates into any UI component library.
 
 ## How does it work?
 
