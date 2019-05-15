@@ -5,7 +5,10 @@ import PropTypes from 'prop-types';
 function withGroupValidation (WrappedComponent) {
     class WithGroupValidation extends PureComponent {
 
-        state = {};
+        state = {
+            __showErrors: false,
+            __isValid: false
+        };
 
         componentDidMount() {
             this.calIsFormValid();
@@ -16,22 +19,25 @@ function withGroupValidation (WrappedComponent) {
         }
 
         calIsFormValid = throttle(() => {
-            // has the user provided an onValidate handle?
-            if (typeof this.props.onValidate !== 'function' || this.props.isValid === undefined) return;
             // this.state is a collection of input elements that are children of this component
             // reduce (this.state) into a true value if every input element isValid,
             // reduce (this.state) into a false value if one or more input elements current state is inValid.
             const isValid =
-                Object.values(this.state)
-                    .reduce( (isValid, inputIsValid) => {
+                Object.entries(this.state).filter(([key, value]) => key !== '__showErrors' && key !== '__isValid')
+                    .reduce( (isValid, [key, inputIsValid]) => {
                         if(!inputIsValid)
                             return false;
                         return isValid;
                     }, true);
 
             // update parent elements state, if necessary
-            if (isValid !== this.props.isValid)
-                this.props.onValidate(isValid);
+            if (isValid !== this.state.__isValid) {
+                this.setState({
+                    __isValid: isValid
+                });
+                if (typeof this.props.onValidate === 'function')
+                    this.props.onValidate(isValid); // notify the parent
+            }
 
         }, this.props.validateDelay);
 
@@ -54,7 +60,7 @@ function withGroupValidation (WrappedComponent) {
                         if ('validate' in child.props) {
                             return cloneElement(child, {
                                 onValidate: this.onInputValidate,
-                                showErrors: this.props.showErrors
+                                showErrors: this.state.__showErrors || this.props.showErrors
                             });
                         } else if (child.props.children) {
                             return cloneElement(child, {
@@ -68,11 +74,25 @@ function withGroupValidation (WrappedComponent) {
             return children;
         }
 
+        onSubmit = this.onSubmit.bind(this);
+        onSubmit(event) {
+            event.preventDefault();
+            const { __isValid } = this.state;
+            if (__isValid) {
+                this.props.onSubmit(event);
+            } else {
+                this.setState({
+                    __showErrors: true
+                });
+            }
+        }
+
         render() {
-            const { isValid, children, onValidate, showErrors, validationDelay, searchDepth, ...props } = this.props;
+            const { isValid, children, onValidate, showErrors, validationDelay, onSubmit, searchDepth, ...props } = this.props;
 
             return (
                 <WrappedComponent
+                    onSubmit={ this.onSubmit }
                     children={ this.mapChildren(children) }
                     {...props }
                 />
@@ -99,7 +119,7 @@ function withGroupValidation (WrappedComponent) {
         }
         static get defaultProps() {
             return {
-                validationDelay: 250,
+                validationDelay: 200,
                 searchDepth: 2
             };
         }
