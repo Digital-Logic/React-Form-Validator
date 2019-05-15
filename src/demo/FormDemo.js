@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useCallback } from 'react';
 import { Input, Form} from '../UI/form';
 import { required, minLength, maxLength, isEmail, isEqualTo } from '../validate/validators';
 import Button from '@material-ui/core/Button';
@@ -36,13 +36,12 @@ const initialState = {
 };
 
 function BasicForm ({ classes, onSubmit }) {
-    const [{ name, email, password, confirmPassword, wrappedComponent, optional, formKey }, dispatch ] =
-        useReducer( reducer, initialState);
+    const [{ name, email, password, confirmPassword, wrappedComponent, optional, formKey }, dispatch ] = useReducer( reducer, initialState);
 
-    function onChange(event) {
+    const onChange = useCallback((event) => {
         const { name, value } = event.target;
         dispatch({ type: name, value });
-    }
+    },[]);
 
     function _onSubmit() {
         onSubmit({
